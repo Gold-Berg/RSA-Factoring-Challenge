@@ -50,8 +50,7 @@ void factorize(const char* filename) {
 
         // Factorize the number
         unsigned long long factor = 2;
-        unsigned long long limit = _sqrt(num);
-        while (factor <= limit) {
+        while (factor * factor <= num) {
             if (num % factor == 0) {
                 printf("%llu=%llu*%llu\n", num, factor, num / factor);
                 break;
@@ -59,7 +58,7 @@ void factorize(const char* filename) {
             factor++;
         }
 
-        if (factor > limit) {
+        if (factor * factor > num) {
             printf("%llu is a prime number\n", num);
         }
     }
