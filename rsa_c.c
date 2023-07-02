@@ -25,6 +25,37 @@ double _sqrt(double x) {
     return guess;
 }
 
+void trimLeadingTrailingSpaces(char* str) {
+    int i = 0;
+    while (str[i] == ' ' || str[i] == '\t' || str[i] == '\n') {
+        i++;
+    }
+    int j = strlen(str) - 1;
+    while (j >= i && (str[j] == ' ' || str[j] == '\t' || str[j] == '\n')) {
+        j--;
+    }
+    str[j + 1] = '\0';
+}
+
+int isPrime(unsigned long long num) {
+    if (num < 2) {
+        return 0;
+    }
+    if (num < 4) {
+        return 1;
+    }
+    if (num % 2 == 0 || num % 3 == 0) {
+        return 0;
+    }
+    unsigned long long limit = (unsigned long long)_sqrt(num);
+    for (unsigned long long i = 5; i <= limit; i += 6) {
+        if (num % i == 0 || num % (i + 2) == 0) {
+            return 0;
+        }
+    }
+    return 1;
+}
+
 void factorize(const char* filename) {
     FILE* file = fopen(filename, "r");
     if (file == NULL) {
@@ -32,21 +63,12 @@ void factorize(const char* filename) {
         return;
     }
 
-    char line[800];
+    char line[20];
     while (fgets(line, sizeof(line), file)) {
-        // Trim leading and trailing white spaces
-        int i = 0;
-        while (line[i] == ' ' || line[i] == '\t' || line[i] == '\n') {
-            i++;
-        }
-        int j = strlen(line) - 1;
-        while (j >= i && (line[j] == ' ' || line[j] == '\t' || line[j] == '\n')) {
-            j--;
-        }
-        line[j + 1] = '\0';
+        trimLeadingTrailingSpaces(line);
 
         // Convert the line to a number
-        unsigned long long num = strtoull(&line[i], NULL, 10);
+        unsigned long long num = strtoull(line, NULL, 10);
 
         // Factorize the number
         unsigned long long factor = 2;
@@ -59,7 +81,11 @@ void factorize(const char* filename) {
         }
 
         if (factor * factor > num) {
-            printf("%llu is a prime number\n", num);
+            if (isPrime(num)) {
+                printf("%llu is a prime number\n", num);
+            } else {
+                printf("%llu cannot be factorized\n", num);
+            }
         }
     }
 
@@ -76,3 +102,4 @@ int main(int argc, char* argv[]) {
 
     return 0;
 }
+
