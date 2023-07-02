@@ -1,0 +1,82 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <ctype.h>
+#include <math.h>
+
+double _sqrt(double x) {
+    if (x < 0) {
+        // Square root of a negative number is undefined
+        return -1.0;
+    }
+
+    double guess = x / 2.0;  // Initial guess
+    double prev_guess;
+
+    // Iterate until the guess converges
+    do {
+        prev_guess = guess;
+        guess = (guess + x / guess) / 2.0;
+    } while (fabs(guess - prev_guess) >= 0.0001);  // Adjust the precision as needed
+
+    return guess;
+}
+
+void factorize(int number) {
+    int divisor, quotient;
+
+    for (divisor = 2; divisor <= _sqrt(number); divisor++) {
+        if (number % divisor == 0) {
+            quotient = number / divisor;
+            printf("%d=%d*%d\n", number, divisor, quotient);
+            return;
+        }
+    }
+
+    printf("%d=%d*1\n", number, number);
+}
+
+int main(int argc, char *argv[]) {
+    if (argc != 2) {
+        printf("Usage: factors <file>\n");
+        return 1;
+    }
+
+    char *filename = argv[1];
+    FILE *file = fopen(filename, "r");
+    if (file == NULL) {
+        printf("Error opening file.\n");
+        return 1;
+    }
+
+    int number;
+    char line[100];
+
+    while (fgets(line, sizeof(line), file) != NULL) {
+        char *start = line;
+        char *end = line;
+        while (isspace(*end)) {
+            end++;
+        }
+
+        while (*end != '\0') {
+            start++;
+            end++;
+        }
+        while (isspace(*end - 1)) {
+            end--;
+        }
+
+        *end = '\0';
+
+        if (*start == '\0') {
+            continue;
+        }
+
+        number = atoi(start);
+        factorize(number);
+    }
+
+    fclose(file);
+    return 0;
+}
+

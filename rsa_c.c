@@ -1,59 +1,52 @@
 #include <stdio.h>
-#include <ctype.h>
 #include <stdlib.h>
+#include <math.h>
 
-void factors(int num)
-{
-	int i;
+double custom_sqrt(double x) {
+    double result = x;  // Initial approximation
+    double epsilon = 0.000001;  // Desired precision
 
-	for (i = 2; i <= num / 2; i++)
-	{
-		if (num % i == 0)
-		{
-			printf("%d=%d*%d\n", num , i , num / i);
-			break;
-		}
-	}
+    while (fabs(result * result - x) > epsilon) {
+        result = (result + x / result) / 2.0;
+    }
+
+    return result;
 }
 
+void factorize_numbers(const char* filename) {
+    FILE* file = fopen(filename, "r");
+    if (file == NULL) {
+        fprintf(stderr, "Error opening file: %s\n", filename);
+        return;
+    }
 
-int main(int argc, char *argv[])
-{
-	if (argc != 2)
-	{
-		printf("Usage: factors <file>\n");
-		return (1);
-	}
+    char buffer[100];
+    while (fgets(buffer, sizeof(buffer), file)) {
+        int number = atoi(buffer);
+        int p = 2;
 
-	char *filen = argv[1];
-	FILE *file = fopen(filen, "r");
-	if (file == NULL)
-	{
-		printf("Error opening file.\n");
-		return (1);
-	}
+        while (p <= custom_sqrt(number)) {
+            if (number % p == 0) {
+                int q = number / p;
+                printf("%d=%d*%d\n", number, p, q);
+                break;
+            }
+            p++;
+        }
+    }
 
-	int num;
-	char line[1500];
-
-
-	while (fgets(line, sizeof(line), file) != NULL)
-	{
-		char *ptr = line;
-		while (isspace(*ptr))
-		{
-			ptr++;
-		}
-		if (*ptr == '\0')
-		{
-			continue;
-		}
-
-		num = atoi(ptr);
-		factors(num);
-
-	}
-
-	fclose(file);
-	return (0);
+    fclose(file);
 }
+
+int main(int argc, char* argv[]) {
+    if (argc != 2) {
+        fprintf(stderr, "Usage: %s <file>\n", argv[0]);
+        return 1;
+    }
+
+    const char* filename = argv[1];
+    factorize_numbers(filename);
+
+    return 0;
+}
+
