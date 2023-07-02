@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <ctype.h>
 #include <stdlib.h>
 
 void factors(int num)
@@ -32,9 +33,24 @@ int main(int argc, char *argv[])
 	}
 
 	int num;
-	while (fscanf(file, "%d\n", &num) != EOF)
+	char line[1500];
+
+
+	while (fgets(line, sizeof(line), file) != NULL)
 	{
+		char *ptr = line;
+		while (isspace(*ptr))
+		{
+			ptr++;
+		}
+		if (*ptr == '\0')
+		{
+			continue;
+		}
+
+		num = atoi(ptr);
 		factors(num);
+
 	}
 
 	fclose(file);
