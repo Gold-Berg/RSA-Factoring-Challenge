@@ -11,6 +11,7 @@ void factors(int num)
 		if (num % i == 0)
 		{
 			printf("%d=%d*%d\n", num , i , num / i);
+			break;
 		}
 	}
 }
