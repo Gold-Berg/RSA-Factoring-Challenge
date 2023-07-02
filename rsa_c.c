@@ -32,7 +32,7 @@ void factorize(const char* filename) {
         return;
     }
 
-    char line[20];
+    char line[800];
     while (fgets(line, sizeof(line), file)) {
         // Trim leading and trailing white spaces
         int i = 0;
