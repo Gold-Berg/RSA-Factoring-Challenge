@@ -71,14 +71,20 @@ void factorize(const char* filename) {
         // Convert the line to a number
         unsigned long long num = strtoull(line, NULL, 10);
 
+        // Skip even numbers greater than 2
+        if (num > 2 && num % 2 == 0) {
+            printf("%llu=2*%llu\n", num, num / 2);
+            continue;
+        }
+
         // Factorize the number
-        unsigned long long factor = 2;
+        unsigned long long factor = 3;
         while (factor * factor <= num) {
             if (num % factor == 0) {
                 printf("%llu=%llu*%llu\n", num, factor, num / factor);
                 break;
             }
-            factor++;
+            factor += 2; // Increment by 2 to skip even factors
         }
 
         if (factor * factor > num) {
@@ -104,4 +110,3 @@ int main(int argc, char* argv[]) {
 
     return 0;
 }
-
