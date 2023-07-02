@@ -63,30 +63,13 @@ void factorize(const char* filename) {
         return;
     }
 
-    char line[20];
-    while (fgets(line, sizeof(line), file)) {
-        // Trim leading and trailing white spaces
-        int i = 0;
-        while (isspace(line[i])) {
-            i++;
-        }
-        int j = strlen(line) - 1;
-        while (j >= i && isspace(line[j])) {
-            j--;
-        }
-        line[j + 1] = '\0';
+    char* line = NULL;
+    size_t line_length = 0;
+    while (getline(&line, &line_length, file) != -1) {
+        trimLeadingTrailingSpaces(line);
 
-        // Validate the line as a natural number
-        char* endptr;
-        unsigned long long num = strtoull(&line[i], &endptr, 10);
-        if (*endptr != '\0') {
-            printf("Invalid number: %s\n", line);
-            continue;
-        }
-        if (num <= 1) {
-            printf("Invalid number: %llu\n", num);
-            continue;
-        }
+        // Convert the line to a number
+        unsigned long long num = strtoull(line, NULL, 10);
 
         // Factorize the number
         unsigned long long factor = 2;
@@ -99,10 +82,15 @@ void factorize(const char* filename) {
         }
 
         if (factor * factor > num) {
-            printf("%llu is a prime number\n", num);
+            if (isPrime(num)) {
+                printf("%llu is a prime number\n", num);
+            } else {
+                printf("%llu cannot be factorized\n", num);
+            }
         }
     }
 
+    free(line);
     fclose(file);
 }
 
