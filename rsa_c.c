@@ -1,37 +1,66 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
+#include <ctype.h>
+#include <string.h>
 #include <math.h>
 
-double custom_sqrt(double x) {
-    double result = x;  // Initial approximation
-    double epsilon = 0.000001;  // Desired precision
-
-    while (fabs(result * result - x) > epsilon) {
-        result = (result + x / result) / 2.0;
+double _sqrt(double x) {
+    if (x < 0) {
+        return -1.0; // Invalid input, return -1
     }
 
-    return result;
+    if (x == 0 || x == 1) {
+        return x; // Square root of 0 or 1 is the number itself
+    }
+
+    double precision = 1e-6; // Adjust the precision as needed
+    double guess = x / 2; // Initial guess is half of x
+
+    // Perform iterative approximation using Babylonian method
+    while (fabs(guess * guess - x) > precision) {
+        guess = 0.5 * (guess + x / guess);
+    }
+
+    return guess;
 }
 
-void factorize_numbers(const char* filename) {
+void factorize(const char* filename) {
     FILE* file = fopen(filename, "r");
     if (file == NULL) {
-        fprintf(stderr, "Error opening file: %s\n", filename);
+        printf("Error opening file: %s\n", filename);
         return;
     }
 
-    char buffer[100];
-    while (fgets(buffer, sizeof(buffer), file)) {
-        int number = atoi(buffer);
-        int p = 2;
+    char line[20];
+    while (fgets(line, sizeof(line), file)) {
+        // Trim leading and trailing white spaces
+        int i = 0;
+        while (line[i] == ' ' || line[i] == '\t' || line[i] == '\n') {
+            i++;
+        }
+        int j = strlen(line) - 1;
+        while (j >= i && (line[j] == ' ' || line[j] == '\t' || line[j] == '\n')) {
+            j--;
+        }
+        line[j + 1] = '\0';
 
-        while (p <= custom_sqrt(number)) {
-            if (number % p == 0) {
-                int q = number / p;
-                printf("%d=%d*%d\n", number, p, q);
+        // Convert the line to a number
+        unsigned long long num = strtoull(&line[i], NULL, 10);
+
+        // Factorize the number
+        unsigned long long factor = 2;
+        unsigned long long limit = _sqrt(num);
+        while (factor <= limit) {
+            if (num % factor == 0) {
+                printf("%llu=%llu*%llu\n", num, factor, num / factor);
                 break;
             }
-            p++;
+            factor++;
+        }
+
+        if (factor > limit) {
+            printf("%llu is a prime number\n", num);
         }
     }
 
@@ -40,13 +69,11 @@ void factorize_numbers(const char* filename) {
 
 int main(int argc, char* argv[]) {
     if (argc != 2) {
-        fprintf(stderr, "Usage: %s <file>\n", argv[0]);
+        printf("Usage: %s <file>\n", argv[0]);
         return 1;
     }
 
-    const char* filename = argv[1];
-    factorize_numbers(filename);
+    factorize(argv[1]);
 
     return 0;
 }
-
